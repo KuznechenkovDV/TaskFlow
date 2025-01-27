@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.title }}{% endblock %}
+
+{% block content %}
+<h2>{{ project.title }}</h2>
+<p><strong>Описание:</strong> {{ project.description }}</p>
+<p><strong>Статус:</strong> {{ project.get_status_display }}</p>
+<p><strong>Дата начала:</strong> {{ project.start_date }}</p>
+<p><strong>Дата окончания:</strong> {{ project.end_date }}</p>
+
+<h3>Задачи</h3>
+<form method="get" class="d-flex mb-3">
+    <input type="text" name="q" class="form-control me-2" placeholder="Поиск по названию..." value="{{ request.GET.q }}">
+    <select name="sort" class="form-select me-2">
+        <option value="title" {% if request.GET.sort == "title" %}selected{% endif %}>Название</option>
+        <option value="start_date" {% if request.GET.sort == "start_date" %}selected{% endif %}>Дата начала</option>
+        <option value="end_date" {% if request.GET.sort == "end_date" %}selected{% endif %}>Дата окончания</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Применить</button>
+</form>
+
+<ul>
+    {% for task in tasks %}
+        <li>
+            <a href="{% url 'task_detail' task.pk %}">{{ task.title }}</a>
+            (Приоритет: {{ task.get_priority_display }}, Статус: {{ task.get_status_display }})
+        </li>
+    {% endfor %}
+</ul>
+<a href="{% url 'project_edit' project.pk %}" class="btn btn-warning">Редактировать проект</a>
+{% endblock %}

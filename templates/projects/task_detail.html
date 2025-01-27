@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ task.title }}{% endblock %}
+
+{% block content %}
+<h2>{{ task.title }}</h2>
+<p><strong>Описание:</strong> {{ task.description }}</p>
+<p><strong>Приоритет:</strong> {{ task.get_priority_display }}</p>
+<p><strong>Статус:</strong> {{ task.get_status_display }}</p>
+<p><strong>Проект:</strong> <a href="{% url 'project_detail' task.project.pk %}">{{ task.project.title }}</a></p>
+<p><strong>Дата начала:</strong> {{ task.start_date }}</p>
+<p><strong>Дата окончания:</strong> {{ task.end_date }}</p>
+<a href="{% url 'task_edit' task.pk %}" class="btn btn-warning">Редактировать задачу</a>
+{% endblock %}
