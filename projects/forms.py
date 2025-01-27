@@ -1,5 +1,5 @@
 from django import forms
-from .models import Project, Task
+from .models import Project, Task, Comment
 
 class ProjectForm(forms.ModelForm):
     class Meta:

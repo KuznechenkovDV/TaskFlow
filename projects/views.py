@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Project, Task
-from django.shortcuts import render
-from .forms import ProjectForm, TaskForm
+from .models import Project, Task, Comment
+from .forms import ProjectForm, TaskForm, CommentForm
 from django.contrib import messages
 from django.db.models import Q
+from django.http import JsonResponse
+import json
+from django.utils.timezone import localtime
 
 
 def project_list(request):
@@ -39,7 +41,38 @@ def project_detail(request, pk):
 
 def task_detail(request, pk):
     task = get_object_or_404(Task, pk=pk)
-    return render(request, 'projects/task_detail.html', {'task': task})
+    comments = task.comments.all()
+
+    if request.method == 'POST' and request.headers.get('Content-Type') == 'application/json':
+        data = json.loads(request.body)
+
+        if data.get('action') == 'add':
+            comment = Comment.objects.create(
+                task=task,
+                user=request.user,
+                text=data.get('text')
+            )
+            return JsonResponse({
+                'success': True,
+                'comment_id': comment.pk,
+                'text': comment.text,
+                'username': comment.user.username,
+                'created_at': localtime(comment.created_at).isoformat()
+            })
+
+        elif data.get('action') == 'edit':
+            comment = get_object_or_404(Comment, pk=data.get('comment_id'), user=request.user)
+            comment.text = data.get('text')
+            comment.save()
+            return JsonResponse({'success': True})
+
+        elif data.get('action') == 'delete':
+            comment = get_object_or_404(Comment, pk=data.get('comment_id'), user=request.user)
+            comment.delete()
+            return JsonResponse({'success': True})
+
+    form = CommentForm()
+    return render(request, 'projects/task_detail.html', {'task': task, 'comments': comments, 'form': form})
 
 
 def project_form(request, pk=None):

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
-
+{% load static %}
+{% load tz %}
 {% block title %}{{ task.title }}{% endblock %}
 
 {% block content %}
@@ -11,4 +12,34 @@
 <p><strong>Дата начала:</strong> {{ task.start_date }}</p>
 <p><strong>Дата окончания:</strong> {{ task.end_date }}</p>
 <a href="{% url 'task_edit' task.pk %}" class="btn btn-warning">Редактировать задачу</a>
+<h3>Комментарии</h3>
+<ul class="list-group mb-4" id="comment-list">
+    {% for comment in comments %}
+    <li class="list-group-item" id="comment-{{ comment.pk }}">
+        <strong>{{ comment.user.username }}:</strong><br>
+        <span class="comment-text">{{ comment.text }}</span>
+        <br>
+        <small class="text-muted js-comment-date" data-iso="{{ comment.created_at }}">{{ comment.created_at }}</small>
+
+        {% if comment.user == request.user %}
+        <div class="mt-2">
+            <button class="btn btn-sm btn-warning edit-comment-btn" data-id="{{ comment.pk }}">Редактировать</button>
+            <button class="btn btn-sm btn-danger delete-comment-btn" data-id="{{ comment.pk }}">Удалить</button>
+        </div>
+        {% endif %}
+    </li>
+    {% empty %}
+    <p>Пока комментариев нет.</p>
+    {% endfor %}
+</ul>
+
+<h4>Оставить комментарий</h4>
+<form id="add-comment-form" class="mb-4">
+    {% csrf_token %}
+    <textarea id="new-comment-text" class="form-control mb-2" rows="3" placeholder="Напишите комментарий..."></textarea>
+    <button type="button" class="btn btn-primary" id="add-comment-btn">Добавить комментарий</button>
+</form>
+<script src="{% static 'js/task_detail.js' %}">
+
+</script>
 {% endblock %}
