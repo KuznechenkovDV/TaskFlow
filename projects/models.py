@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.urls import reverse
 
 class Profile(models.Model):
     ROLE_CHOICES = [
@@ -65,7 +66,8 @@ class Project(models.Model):
         default='default_project.jpg',
         verbose_name="Изображение проекта"
     )
-
+    def get_absolute_url(self):
+        return reverse('project_detail', kwargs={'pk': self.pk})
     def __str__(self):
         return self.title
     class Meta:
@@ -118,6 +120,9 @@ class Task(models.Model):
         blank=True,
         verbose_name="Исполнитель"
     )
+    def get_absolute_url(self):
+        return reverse('task_detail', kwargs={'pk': self.pk})
+
     def __str__(self):
         return f"{self.title} ({self.project.title})"
 
