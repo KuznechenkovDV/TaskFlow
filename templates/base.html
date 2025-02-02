@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     {% load static %}
+    {% load account %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}TaskFlow{% endblock %}</title>
@@ -12,10 +13,13 @@
 </head>
 <body>
     <header class="bg-dark text-white py-3">
+
         <div class="container d-flex justify-content-between align-items-center">
             <h1 class="mb-0">TaskFlow</h1>
+
             <div>
                 {% if user.is_authenticated %}
+                    <h3>{% user_display user %}{% if user.profile %}({{ user.profile.get_role_display }}){% endif %}</h3>
                     <a href="{% url 'profile' %}" class="text-white me-3">Profile</a>
                     <a href="{% url 'logout' %}" class="text-white">Logout</a>
                 {% else %}
@@ -25,6 +29,16 @@
     </header>
 
     <main class="container my-4">
+        {% if messages %}
+          <div class="container mt-3">
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
         {% block content %}
         {% endblock %}
     </main>

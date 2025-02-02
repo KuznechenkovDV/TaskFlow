@@ -1,3 +1,4 @@
+from channels.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Project, Task, Comment, Profile, TaskFile
@@ -243,9 +244,18 @@ def index(request):
 
 class CustomLogoutView(LogoutView):
     http_method_names = ['get', 'post']
-    def dispatch(self, request, *args, **kwargs):
-        messages.info(request, 'You have been logged out successfully.')
+
+    def logout_and_redirect(self, request):
+        logout(request)
+        request.session.flush()
+        messages.info(request, "You have been logged out successfully.")
         return redirect('login')
+
+    def get(self, request):
+        return self.logout_and_redirect(request)
+
+    def post(self, request):
+        return self.logout_and_redirect(request)
 
 class CustomPasswordResetView(PasswordResetView):
     def form_valid(self, form):
