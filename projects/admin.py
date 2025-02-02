@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Project, Task, Comment, TaskFile
+from .models import Project, Task, Comment, TaskFile, Profile
 
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
@@ -24,3 +24,8 @@ class TaskFileAdmin(admin.ModelAdmin):
     list_display = ('task', 'file', 'uploaded_at')
     list_filter = ('uploaded_at',)
 
+@admin.register(Profile)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'role', 'location')
+    list_filter = ('role',)
+    search_fields = ('user__username', 'role')
