@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Регистрация завершена | TaskFlow{% endblock %}
+
+{% block content %}
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="row justify-content-center">
+    <div class="col-md-6 text-center">
+        <h2>Регистрация прошла успешно!</h2>
+        <p>Спасибо за регистрацию, {{ new_user }}. Теперь вы можете <a href="{% url 'login' %}">войти в систему</a>.</p>
+    </div>
+</div>
+{% endblock %}

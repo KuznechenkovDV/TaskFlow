@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Профиль | TaskFlow{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <h2>Профиль пользователя</h2>
+        <div class="card mb-4">
+            <div class="card-body">
+                {% if user.profile.photo %}
+                    <img src="{{ user.profile.photo.url }}" alt="Фото профиля" class="img-thumbnail mb-3" style="max-width: 150px;">
+                {% endif %}
+                <p><strong>Имя пользователя:</strong> {{ user.username }}</p>
+                <p><strong>Имя:</strong> {{ user.first_name }}</p>
+                <p><strong>Роль:</strong> {{ role }}</p>
+                <p><strong>Email:</strong> {{ user.email }}</p>
+                {% if user.profile.location %}
+                    <p><strong>Местоположение:</strong> {{ user.profile.location }}</p>
+                {% endif %}
+                {% if user.profile.bio %}
+                    <p><strong>О себе:</strong> {{ user.profile.bio }}</p>
+                {% endif %}
+                <a href="{% url 'edit_profile' %}" class="btn btn-primary mt-3">Редактировать профиль</a>
+            </div>
+        </div>
+
+        <!-- Блок проектов -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">Проекты</h3>
+                {% if user.profile.role == 'admin' or user.profile.role == 'manager' %}
+                    <a href="{% url 'project_create' %}" class="btn btn-success btn-sm">Создать новый проект</a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if projects %}
+                    <ul class="list-group">
+                        {% for project in projects %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <a href="{% url 'project_detail' project.pk %}">{{ project.title }}</a>
+                                {% if user.profile.role == 'admin' or user.profile.role == 'manager' %}
+                                    <span>
+                                        <a href="{% url 'project_edit' project.pk %}" class="btn btn-primary btn-sm me-1">Редактировать</a>
+                                        <a href="{% url 'project_delete' project.pk %}" class="btn btn-danger btn-sm">Удалить</a>
+                                    </span>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>Нет проектов.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Блок задач -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">Задачи</h3>
+            </div>
+            <div class="card-body">
+                {% if tasks %}
+                    <ul class="list-group">
+                        {% for task in tasks %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <a href="{% url 'task_detail' task.pk %}">{{ task.title }}</a>
+                                {% if user.profile.role == 'admin' or user.profile.role == 'manager' %}
+                                    <span>
+                                        <a href="{% url 'task_edit' task.pk %}" class="btn btn-primary btn-sm me-1">Редактировать</a>
+                                        <a href="{% url 'task_delete' task.pk %}" class="btn btn-danger btn-sm">Удалить</a>
+                                    </span>
+                                {% elif user.profile.role == 'executor' %}
+                                    <!-- Для исполнителя — возможность обновить статус задачи -->
+                                    <a href="{% url 'task_edit' task.pk %}" class="btn btn-secondary btn-sm">Обновить статус</a>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>Нет задач.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

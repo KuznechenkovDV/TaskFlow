@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактировать профиль | TaskFlow{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h2>Редактировать профиль</h2>
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            <h4>Основные данные</h4>
+            {{ user_form.non_field_errors }}
+            <div class="mb-3">
+                {{ user_form.username.label_tag }}
+                {{ user_form.username }}
+                {% for error in user_form.username.errors %}
+                    <div class="text-danger"><small>{{ error }}</small></div>
+                {% endfor %}
+            </div>
+            <div class="mb-3">
+                {{ user_form.email.label_tag }}
+                {{ user_form.email }}
+                {% for error in user_form.email.errors %}
+                    <div class="text-danger"><small>{{ error }}</small></div>
+                {% endfor %}
+            </div>
+            <hr>
+            <h4>Профиль</h4>
+            {{ profile_form.non_field_errors }}
+            <div class="mb-3">
+                {{ profile_form.photo.label_tag }}
+                {{ profile_form.photo }}
+                {% for error in profile_form.photo.errors %}
+                    <div class="text-danger"><small>{{ error }}</small></div>
+                {% endfor %}
+            </div>
+            <div class="mb-3">
+                {{ profile_form.location.label_tag }}
+                {{ profile_form.location }}
+                {% for error in profile_form.location.errors %}
+                    <div class="text-danger"><small>{{ error }}</small></div>
+                {% endfor %}
+            </div>
+            <div class="mb-3">
+                {{ profile_form.bio.label_tag }}
+                {{ profile_form.bio }}
+                {% for error in profile_form.bio.errors %}
+                    <div class="text-danger"><small>{{ error }}</small></div>
+                {% endfor %}
+            </div>
+            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
