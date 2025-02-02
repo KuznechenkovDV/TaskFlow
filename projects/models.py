@@ -1,5 +1,35 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+class Profile(models.Model):
+    ROLE_CHOICES = [
+        ('admin', 'Администратор'),
+        ('manager', 'Менеджер проекта'),
+        ('executor', 'Исполнитель'),
+    ]
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='executor', verbose_name="Роль")
+    photo = models.ImageField(upload_to='profile_photos/', blank=True, null=True, default='default-avatar.jpg',
+    verbose_name="Фото")
+    location = models.CharField(max_length=100, blank=True, null=True, verbose_name="Местоположение")
+    bio = models.TextField(blank=True, null=True, verbose_name="О себе")
+
+    def __str__(self):
+        return f"{self.user.username} ({self.get_role_display()})"
+
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.profile.save()
+
 
 class Project(models.Model):
     STATUS_CHOICES = [
@@ -18,9 +48,18 @@ class Project(models.Model):
         default='active',
         verbose_name="Статус"
     )
+    manager = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Менеджер проекта"
+    )
 
     def __str__(self):
         return self.title
+    class Meta:
+        verbose_name_plural = "Проекты"
 
 
 class Task(models.Model):
@@ -30,14 +69,14 @@ class Task(models.Model):
         ('low', 'Низкий'),
     ]
 
-    # Расширенные статусы
+
     STATUS_CHOICES = [
         ('not_started', 'Не начата'),
         ('in_progress', 'В процессе'),
         ('completed', 'Завершена'),
-        ('on_hold', 'На удержании'),       # Новый статус
-        ('cancelled', 'Отменена'),        # Новый статус
-        ('under_review', 'На проверке'), # Новый статус
+        ('on_hold', 'На удержании'),
+        ('cancelled', 'Отменена'),
+        ('under_review', 'На проверке'),
     ]
 
     title = models.CharField(max_length=255, verbose_name="Название задачи")
@@ -62,9 +101,18 @@ class Task(models.Model):
     )
     start_date = models.DateField(verbose_name="Дата начала")
     end_date = models.DateField(verbose_name="Дата окончания")
-
+    executor = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Исполнитель"
+    )
     def __str__(self):
         return f"{self.title} ({self.project.title})"
+
+    class Meta:
+        verbose_name_plural = "Задачи"
 
 
 class Comment(models.Model):
@@ -98,3 +146,4 @@ class TaskFile(models.Model):
 
     def __str__(self):
         return f"Файл для задачи {self.task.title}"
+
