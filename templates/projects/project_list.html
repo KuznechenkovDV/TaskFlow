@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Список проектов | TaskFlow{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for project in projects %}
+      <div class="col">
+        <!-- Оборачиваем карточку в ссылку для кликабельности -->
+        <a href="{% url 'project_detail' project.pk %}" class="text-decoration-none text-dark">
+          <div class="card h-100">
+            {% if project.image %}
+              <img src="{{ project.image.url }}" class="card-img-top" alt="{{ project.title }}">
+            {% else %}
+              <img src="{% static 'images/default_project.jpg' %}" class="card-img-top" alt="{{ project.title }}">
+            {% endif %}
+            <div class="card-body">
+              <h5 class="card-title">{{ project.title }}</h5>
+              <p class="card-text">
+                Статус: {{ project.get_status_display }}<br>
+                Менеджер: {% if project.manager %}{{ project.manager.username }}{% else %}Не назначен{% endif %}<br>
+                Дата начала: {{ project.start_date|date:"d.m.Y" }}
+              </p>
+            </div>
+          </div>
+        </a>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <p>Нет проектов.</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
