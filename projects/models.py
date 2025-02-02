@@ -58,6 +58,13 @@ class Project(models.Model):
         blank=True,
         verbose_name="Менеджер проекта"
     )
+    image = models.ImageField(
+        upload_to='project_images/',
+        blank=True,
+        null=True,
+        default='default_project.jpg',
+        verbose_name="Изображение проекта"
+    )
 
     def __str__(self):
         return self.title

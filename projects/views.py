@@ -143,9 +143,15 @@ def project_form(request, pk=None):
 
     if request.method == 'POST':
         form = ProjectForm(request.POST, instance=project)
+        if is_admin(request.user):
+            form.fields['manager'] = forms.ModelChoiceField(
+                queryset=User.objects.all()
+            )
         if form.is_valid():
             project_instance = form.save(commit=False)
-            if is_manager(request.user):
+            if is_admin(request.user):
+                project_instance.manager = form.cleaned_data.get('manager')
+            elif is_manager(request.user):
                 project_instance.manager = request.user
             project_instance.save()
             messages.success(request, "Project saved successfully!")
